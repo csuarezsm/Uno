@@ -1,7 +1,7 @@
 {
   "name": "UNO",
   "short_name": "UNO",
-  "description": "Texas Hold'em: torneos con fichas ficticias contra la máquina o en línea con amigos, con modo aprendizaje.",
+  "description": "Cartas de colores contra la máquina o en línea con amigos, con modo aprendizaje.",
   "id": "./",
   "start_url": "./",
   "scope": "./",

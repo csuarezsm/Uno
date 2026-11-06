@@ -8,7 +8,7 @@ Paquete: `com.itcanarias.uno` · versión 1.0.0
 
 © 2026 IT Canarias. Todos los derechos reservados. App independiente: no está afiliada a Mattel; UNO® es marca de sus propietarios. Diseño de cartas propio.
 
-Hecha con la misma plantilla que Ajedrez, Damas, Chinchón, Pumba, Parchís y Póker (tema por defecto: noche azul). Las reglas, con sus fuentes, están en [REGLAS.md](REGLAS.md).
+Hecha con la misma plantilla que Ajedrez, Damas, Chinchón, Pumba, Parchís, Póker e Invasores espaciales (tema por defecto: noche azul). Las reglas, con sus fuentes, están en [REGLAS.md](REGLAS.md).
 
 ## Qué hace
 

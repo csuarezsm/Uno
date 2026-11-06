@@ -4,7 +4,7 @@
   "private": true,
   "author": "IT Canarias",
   "license": "UNLICENSED",
-  "description": "UNO (Texas Hold'em): torneos contra la máquina y en línea, con modo aprendizaje (IT Canarias)",
+  "description": "UNO: cartas contra la máquina y en línea, con modo aprendizaje (IT Canarias)",
   "scripts": {
     "sync": "npx cap sync android",
     "open": "npx cap open android",

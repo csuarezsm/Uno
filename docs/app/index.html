@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="author" content="IT Canarias">
+<meta name="copyright" content="© 2026 IT Canarias. Todos los derechos reservados.">
+<meta name="theme-color" content="#1b2a3a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="UNO">
+<meta name="format-detection" content="telephone=no">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<title>UNO</title>
+<style>
+:root{
+  --bg:#121c27; --felt:#1b2a3a; --card:#22364a; --card2:#2b445c; --line:#3a5873;
+  --txt:#f1f4f8; --mut:#a3b3c4; --gold:#f2b84b; --red:#ff6b6b; --blue:#6cc4e8; --ok:#62d39a;
+  --r:14px; --on-gold:#2a1e00; --on-blue:#062a33; --outbg:#262a33;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;overflow-x:hidden;background:var(--bg);color:var(--txt);font:calc(16px * var(--fs, 1))/1.35 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body{min-height:100vh;padding-bottom:calc(90px + env(safe-area-inset-bottom))}
+header{position:sticky;top:0;z-index:5;background:var(--felt);border-bottom:1px solid var(--line);
+  padding:calc(10px + env(safe-area-inset-top)) 14px 10px;display:flex;align-items:center;gap:10px}
+header h1{font-size:calc(19px * var(--fs, 1));margin:0;flex:1;letter-spacing:.3px;min-width:0}
+header h1 small{display:block;font-size:calc(12px * var(--fs, 1));color:var(--mut);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+main{padding:14px;max-width:720px;margin:0 auto}
+button{font:inherit;color:inherit;border:0;border-radius:12px;padding:12px 16px;background:var(--card2);cursor:pointer}
+button:active{transform:scale(.97)}
+button[disabled]{opacity:.4}
+.btn-gold{background:var(--gold);color:var(--on-gold);font-weight:700}
+.btn-red{background:var(--red);color:#fff;font-weight:600}
+.btn-ghost{background:transparent;border:1px solid var(--line)}
+.icon{position:relative;width:42px;height:42px;padding:0;display:grid;place-items:center;font-size:calc(20px * var(--fs, 1));background:transparent}
+.sec{background:var(--card);border-radius:var(--r);padding:14px;margin-bottom:14px}
+.sec h2{font-size:calc(15px * var(--fs, 1));margin:0 0 10px;color:var(--gold);text-transform:uppercase;letter-spacing:.6px}
+label.f{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px solid var(--line)}
+label.f:first-of-type{border-top:0}
+label.f span{flex:1;min-width:0}
+label.f em{display:block;font-style:normal;font-size:calc(12px * var(--fs, 1));color:var(--mut)}
+input,select{font:inherit;color:var(--txt);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+input[type=number]{width:90px;text-align:center}
+input:focus,select:focus{outline:2px solid var(--gold);outline-offset:0}
+input.tg{appearance:none;-webkit-appearance:none;width:52px;height:30px;border-radius:999px;background:var(--bg);border:1px solid var(--line);position:relative;flex:none;padding:0;cursor:pointer;transition:background .15s}
+input.tg::after{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:var(--mut);transition:transform .15s,background .15s}
+input.tg:checked{background:var(--gold);border-color:var(--gold)}
+input.tg:checked::after{transform:translateX(22px);background:var(--on-gold)}
+.plist .pr{display:flex;gap:6px;align-items:center;margin-bottom:8px}
+.plist .pr input{flex:1;min-width:0}
+.plist .pr button{padding:10px 12px}
+.side svg{width:34px;height:34px;display:block}
+.row{display:flex;gap:10px}
+.row>*{flex:1}
+.mut{color:var(--mut);font-size:calc(13px * var(--fs, 1))}
+.fab{position:fixed;left:14px;right:14px;bottom:calc(14px + env(safe-area-inset-bottom));max-width:692px;margin:0 auto;
+  padding:16px;font-size:calc(18px * var(--fs, 1));box-shadow:0 6px 20px rgba(0,0,0,.4);z-index:6}
+
+/* Tablas */
+.tbl-wrap{overflow-x:auto;border-radius:var(--r);background:var(--card)}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font-size:calc(14px * var(--fs, 1))}
+th,td{padding:8px 6px;text-align:center;border-bottom:1px solid var(--line);white-space:nowrap}
+th{position:sticky;top:0;background:var(--card2);font-size:calc(13px * var(--fs, 1));max-width:90px;overflow:hidden;text-overflow:ellipsis}
+td:first-child,th:first-child{text-align:left;padding-left:10px;color:var(--mut);position:sticky;left:0;background:var(--card)}
+th:first-child{background:var(--card2)}
+
+/* Ventanas */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:20;display:flex;align-items:flex-end;justify-content:center}
+.modal.hidden{display:none}
+.sheet{background:var(--felt);width:100%;max-width:720px;max-height:92vh;overflow-y:auto;overflow-x:hidden;border-radius:20px 20px 0 0;
+  padding:16px 16px calc(16px + env(safe-area-inset-bottom))}
+.sheet h3{margin:0 0 4px;font-size:calc(20px * var(--fs, 1))}
+.sheet .sub{color:var(--mut);font-size:calc(13px * var(--fs, 1));margin-bottom:12px}
+.hrow{background:var(--card);border-radius:12px;padding:10px 12px;margin-bottom:8px}
+.hrow .top{display:flex;align-items:center;gap:10px}
+.hrow .top .n{flex:1;font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hrow .top .n small.wrap{white-space:normal}
+.hrow .top .n small{display:block;font-weight:400;color:var(--mut);font-size:calc(12px * var(--fs, 1))}
+.closebtn{padding:8px 10px;font-size:calc(13px * var(--fs, 1));background:transparent;border:1px solid var(--line);white-space:nowrap}
+.kinds{display:flex;gap:6px;margin-top:8px}
+.kinds button{flex:1;min-width:0;overflow-wrap:anywhere;padding:8px 6px;font-size:calc(13px * var(--fs, 1));background:var(--bg);border:1px solid var(--line)}
+.kinds button.on{background:var(--gold);color:var(--on-gold);font-weight:700;border-color:var(--gold)}
+.sheet .acts{display:flex;gap:10px;margin-top:14px}
+.sheet .acts button{flex:1;padding:14px}
+#toast{position:fixed;left:50%;bottom:100px;transform:translateX(-50%);background:#000c;color:#fff;padding:10px 16px;border-radius:999px;font-size:calc(14px * var(--fs, 1));opacity:0;transition:opacity .25s;pointer-events:none;z-index:30;max-width:90vw;text-align:center}
+#toast.on{opacity:1}
+.menu button{display:block;width:100%;text-align:left;margin-bottom:8px;background:var(--card)}
+.menu .mt{font-size:calc(12px * var(--fs, 1));font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);margin:14px 4px 6px}.menu .mt:first-child{margin-top:4px}
+.menu .mg2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}.menu .mg2 button{margin:0}
+.menu button.btn-gold{background:var(--gold);color:var(--on-gold)}
+.menu button.btn-red{background:var(--red);color:#fff}
+.donate{background:var(--card);border:1px solid var(--gold);border-radius:14px;padding:14px;margin-top:4px;text-align:center}
+.donate .dt{font-weight:800;font-size:calc(17px * var(--fs, 1));color:var(--gold)}
+.donate .dd{color:var(--mut);font-size:calc(14px * var(--fs, 1));margin:6px 0 12px}
+.donate button{width:100%;padding:14px;font-size:calc(16px * var(--fs, 1))}
+.copy{text-align:center;color:var(--mut);font-size:calc(12px * var(--fs, 1));padding:8px 0 4px;opacity:.8}
+.themes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:6px 0 4px}
+.th{padding:0;border-radius:14px;overflow:hidden;border:3px solid transparent;text-align:left;background:none}
+.th.on{border-color:var(--gold)}
+.th .pv{height:74px;padding:10px;display:flex;gap:6px;align-items:flex-end}
+.th .pv i{flex:1;height:38px;border-radius:8px;display:block}
+.th .pv b{width:26px;height:26px;border-radius:50%;display:block;flex:none}
+.th .tn{padding:8px 10px;font-weight:700;font-size:calc(14px * var(--fs, 1));display:flex;justify-content:space-between}
+.bthemes{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:6px 0 10px}
+.bthemes button{padding:0;border-radius:10px;overflow:hidden;border:3px solid transparent;background:none}
+.bthemes button.on{border-color:var(--gold)}
+.bthemes .mini{display:grid;grid-template-columns:1fr 1fr;aspect-ratio:1}
+.bthemes span{display:block;font-size:calc(11px * var(--fs, 1));padding:3px 0;text-align:center;background:var(--card)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 12px}
+.chipb{padding:8px 14px;border-radius:999px;background:var(--bg);border:1px solid var(--line);font-size:calc(15px * var(--fs, 1))}
+.chipb.on{background:var(--gold);color:var(--on-gold);border-color:var(--gold);font-weight:700}
+#menuBtn.dot::after{content:'';position:absolute;top:6px;right:6px;width:11px;height:11px;border-radius:50%;background:var(--red);box-shadow:0 0 0 2px var(--felt)}
+#updBanner{display:none;background:var(--gold);color:var(--on-gold);font-weight:700;text-align:center;padding:10px 14px;cursor:pointer;font-size:calc(15px * var(--fs, 1))}
+#updBanner.on{display:block}
+.pf-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.pf-av{width:48px;height:48px;border-radius:50%;background:var(--gold);color:var(--on-gold);display:grid;place-items:center;font-weight:800;flex:none}
+.pf-rating{font-size:calc(30px * var(--fs, 1));font-weight:800;color:var(--gold);line-height:1}
+.pf-kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.pf-kpi{background:var(--card);border-radius:12px;padding:10px 12px}
+.pf-kpi span{display:block;font-size:calc(12px * var(--fs, 1));color:var(--mut)}
+.pf-kpi b{font-size:calc(22px * var(--fs, 1))}
+.pf-kpi small,.pf-line small,.pf-t small{font-weight:400;color:var(--mut);font-size:calc(13px * var(--fs, 1))}
+.pf-t{font-weight:700;color:var(--gold);margin:6px 0 6px;font-size:calc(14px * var(--fs, 1))}
+.pf-box{background:var(--card);border-radius:12px;padding:6px 12px;margin-bottom:10px}
+.pf-line{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px solid var(--line)}
+.pf-line:first-child{border-top:0}
+.pf-h2h{display:flex;align-items:center;gap:10px;padding:6px 0}
+.pf-h2h span{width:30%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pf-h2h b{width:62px;text-align:right}
+.pf-bar{flex:1;height:10px;border-radius:5px;background:var(--red);overflow:hidden;opacity:.9;display:flex}
+.pf-bar i{display:block;height:100%;background:var(--ok)}
+.pf-bar u{display:block;height:100%;background:var(--mut)}
+.pf-months{display:flex;align-items:flex-end;gap:8px;height:110px;padding-top:6px}
+.pf-months div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px;height:100%}
+.pf-months i{display:block;width:100%;background:var(--card2);border-radius:5px 5px 0 0}
+.pf-months small,.pf-months span{font-size:calc(11px * var(--fs, 1));color:var(--mut)}
+.empty{text-align:center;color:var(--mut);padding:20px}
+.rules h4{color:var(--gold);margin:14px 0 4px}
+.rules p,.rules li{color:var(--txt);line-height:1.5;margin:4px 0}
+.rules ul{padding-left:20px;margin:4px 0}
+
+/* Inicio */
+.modes{margin:0 0 14px}
+.modes button{padding:12px 4px;font-size:calc(14px * var(--fs, 1))}
+.colbtn{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 6px!important}
+.colbtn svg{width:26px;height:26px;flex:none}
+.levels{display:flex;flex-direction:column;gap:6px}
+.lvl{display:flex;align-items:center;gap:12px;text-align:left;background:var(--bg);border:1px solid var(--line);padding:10px 12px}
+.lvl b{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--card2);flex:none}
+.lvl span{flex:1;min-width:0;font-weight:700}
+.lvl em{display:block;font-style:normal;font-weight:400;color:var(--mut);font-size:calc(12px * var(--fs, 1))}
+.lvl small{color:var(--mut);font-size:calc(12px * var(--fs, 1))}
+.lvl.on{border-color:var(--gold);background:var(--card2)}
+.lvl.on b{background:var(--gold);color:var(--on-gold)}
+.res{display:inline-block;min-width:44px;text-align:center;padding:2px 6px;border-radius:6px;background:var(--card2);font-size:calc(12px * var(--fs, 1));font-weight:700;color:var(--txt)}
+.res.w{background:var(--ok);color:#06210f}.res.l{background:var(--red);color:#fff}
+
+.res{display:inline-block;min-width:44px;text-align:center;padding:2px 6px;border-radius:6px;background:var(--card2);font-size:calc(12px * var(--fs, 1));font-weight:700;color:var(--txt)}
+.res.w{background:var(--ok);color:#06210f}.res.l{background:var(--red);color:#fff}
+.cdot{display:inline-block;width:14px;height:14px;border-radius:50%;flex:none;vertical-align:-2px;box-shadow:0 0 0 1.5px rgba(0,0,0,.25)}
+.colbtn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px 2px!important;font-size:calc(13px * var(--fs, 1))!important}
+.colbtn .cdot{width:22px;height:22px}
+.kinds button.colbtn.on{background:var(--card2);color:var(--txt);border:2px solid var(--gold)}
+.dice{border:3px solid var(--dc, transparent)}
+.lseat{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--line)}
+.lseat:first-of-type{border-top:0}
+.lseat .cn{width:70px;flex:none;font-size:calc(14px * var(--fs, 1))}
+.lseat .kinds button{flex:none;width:40px;padding:8px 0}
+.lseat input{flex:1;min-width:0;width:0}
+.lseat .lsx{flex:1}
+/* En línea */
+.on-code{font-size:calc(46px * var(--fs, 1));font-weight:800;letter-spacing:10px;color:var(--gold);margin:4px 0 12px;font-variant-numeric:tabular-nums}
+.on-seat{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.on-seat:first-of-type{border-top:0}
+.on-seat .n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+.on-seat .n small{color:var(--mut);font-weight:400}
+.on-seat button{padding:4px 12px}
+.on-dot{width:10px;height:10px;border-radius:50%;background:var(--red);flex:none}
+.on-dot.ok{background:var(--ok)}
+
+/* Partida */
+body:has(.gm){padding-bottom:calc(10px + env(safe-area-inset-bottom))}
+main:has(.gm){padding-top:8px}
+.gm{display:flex;flex-direction:column;gap:8px}
+.pchips{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.pchip{display:flex;align-items:center;gap:6px;background:var(--card);border-radius:10px;padding:6px 8px;min-width:0;border:2px solid transparent}
+.pchip b{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:calc(14px * var(--fs, 1))}
+.pchip small{color:var(--mut);font-size:calc(12px * var(--fs, 1));white-space:nowrap}
+.pchip.turn{border-color:var(--pc);background:var(--card2)}
+.gb{width:100%;max-width:min(100%, calc(100svh - 300px));margin:0 auto;min-width:260px}
+.board{position:relative;width:100%;aspect-ratio:1;border-radius:8px;overflow:hidden;touch-action:manipulation;user-select:none;-webkit-user-select:none;box-shadow:0 4px 16px rgba(0,0,0,.35)}
+.pboard{display:block;width:100%;height:100%}
+.pz{transition:transform .2s linear}
+.pz circle{filter:drop-shadow(0 .35px .4px rgba(0,0,0,.45))}
+.pz.moving{filter:drop-shadow(0 1px 1.2px rgba(0,0,0,.5))}
+.pz .ring{animation:pulse 1s ease-in-out infinite;filter:none}
+.dest{pointer-events:none;animation:pulse 1s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.25}}
+.gs{min-width:0}
+.gstatus{display:flex;align-items:center;justify-content:center;gap:8px;text-align:center;font-weight:700;padding:9px 10px;background:var(--card);border-radius:12px;min-height:44px}
+.gstatus.go{background:var(--card2);box-shadow:inset 0 0 0 2px var(--gold)}
+.gstatus.end{background:var(--gold);color:var(--on-gold)}
+.drow{display:flex;gap:10px;align-items:stretch;margin-top:8px}
+.dice{width:78px;height:78px;flex:none;padding:8px;border-radius:16px;background:#fbfaf6;box-shadow:0 3px 0 #bdb7a8,0 4px 12px rgba(0,0,0,.35)}
+.dice[disabled]{opacity:.92}
+.dice.go{box-shadow:0 3px 0 #bdb7a8,0 0 0 3px var(--gold),0 4px 14px rgba(0,0,0,.4);animation:nudge 1.6s ease-in-out infinite}
+.dice.rolling{animation:shake .14s linear infinite;opacity:1}
+@keyframes nudge{0%,80%,100%{transform:none}88%{transform:rotate(-8deg)}94%{transform:rotate(8deg)}}
+@keyframes shake{0%{transform:rotate(-10deg)}50%{transform:rotate(10deg)}100%{transform:rotate(-10deg)}}
+.pips{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);width:100%;height:100%;gap:2px}
+.pips i{display:block;border-radius:50%;margin:16%}
+.pips i.on{background:#22252b}
+.glog{flex:1;min-width:0;background:var(--card);border-radius:12px;padding:8px 10px;font-size:calc(14px * var(--fs, 1));line-height:1.35;display:flex;flex-direction:column;justify-content:center;gap:2px}
+.glog div{overflow:hidden;text-overflow:ellipsis}
+.gacts{display:flex;gap:6px;flex-wrap:wrap}
+.gacts button{flex:1 1 auto;padding:12px 8px;min-width:0;font-size:calc(15px * var(--fs, 1))}
+/* Horizontal (móvil tumbado) */
+@media (orientation: landscape) and (max-height: 600px) {
+  header{padding-top:calc(4px + env(safe-area-inset-top));padding-bottom:4px}
+  header h1 small{display:inline;margin-left:8px}
+  main:has(.gm){max-width:none;padding:6px 14px}
+  .gm{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto 1fr;gap:8px 16px;align-items:start}
+  .gb{grid-row:1 / span 2;grid-column:1;width:calc(100svh - 72px);max-width:none;min-width:0;margin:0}
+  .pchips{grid-column:2}
+  .gs{grid-column:2}
+}
+/* Tableta */
+@media (min-width: 700px) and (min-height: 700px) {
+  main:has(.gm){max-width:1100px}
+  .gb{max-width:min(640px, calc(100svh - 320px))}
+}
+@media (min-width: 900px) and (orientation: landscape) and (min-height: 601px) {
+  .gm{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto 1fr;gap:12px 24px;align-items:start}
+  .gb{grid-row:1 / span 2;width:min(calc(100svh - 120px), 60vw);max-width:none;margin:0}
+  .pchips{grid-column:2;grid-template-columns:1fr}
+  .gs{grid-column:2}
+}
+
+/* ===== UNO ===== */
+.k0{--kc:#d9453b}.k1{--kc:#f0b92a}.k2{--kc:#2f9e57}.k3{--kc:#2a6fd0}
+.cdot{background:var(--kc,var(--mut))}
+.un{display:flex;flex-direction:column;gap:10px}
+.un-opps{display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:6px}
+.opp{position:relative;background:var(--card);border:2px solid transparent;border-radius:12px;padding:6px 6px 8px;min-width:0;text-align:center}
+.opp.turn{border-color:var(--gold);box-shadow:0 0 0 2px #0003,0 0 14px #f4c13d55}
+.opp.exp{border-color:var(--red)}
+.opp .on{font-weight:700;font-size:calc(13px * var(--fs, 1));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ofan{display:flex;justify-content:center;margin:5px 0 3px;min-height:34px}
+.ofan .uc{margin-left:-14px}.ofan .uc:first-child{margin-left:0}
+.ocnt{font-size:calc(12px * var(--fs, 1));color:var(--mut)}.ocnt b{color:var(--txt);font-size:calc(14px * var(--fs, 1))}
+.unob{display:inline-block;margin-top:3px;padding:1px 9px;border-radius:999px;background:var(--red);color:#fff;font-weight:800;font-size:calc(11px * var(--fs, 1))}
+.unob.ok{background:var(--ok);color:#06210f}
+.uc{position:relative;display:inline-flex;align-items:center;justify-content:center;width:calc(48px * var(--fs, 1));height:calc(70px * var(--fs, 1));border-radius:8px;background:var(--cc,#444);color:#fff;border:2px solid #f3efe2;box-shadow:0 1px 4px #0006;font-style:normal;line-height:1;flex:none;overflow:hidden}
+.uc.c0{--cc:#d9453b}.uc.c1{--cc:#f0b92a}.uc.c2{--cc:#2f9e57}.uc.c3{--cc:#2a6fd0}
+.uc.c4{background:conic-gradient(#d9453b 0 25%,#f0b92a 0 50%,#2f9e57 0 75%,#2a6fd0 0)}
+.uc::before{content:'';position:absolute;width:72%;height:80%;background:#f6f2e6;border-radius:50%;transform:rotate(25deg)}
+.uc b{position:relative;font-size:calc(24px * var(--fs, 1));font-weight:900;color:var(--cc,#222)}
+.uc.c4 b{color:#222}
+.uc u{position:absolute;top:2px;left:4px;text-decoration:none;font-size:calc(10px * var(--fs, 1));font-weight:800;color:#fff;text-shadow:0 0 2px #0008}
+.uc.c1 u{color:#2a1e00;text-shadow:none}
+.uc em{position:absolute;bottom:2px;right:4px;font-size:calc(8px * var(--fs, 1));font-style:normal;font-weight:800;color:#fff;text-shadow:0 0 2px #0008}
+.uc.c1 em{color:#2a1e00;text-shadow:none}
+.uc.back{background:#15151d;--cc:#15151d}
+.uc.back::before{background:#d9453b}
+.uc.back b{color:#f0b92a;font-size:calc(14px * var(--fs, 1));transform:rotate(-25deg);letter-spacing:.5px}
+.uc.sm{width:calc(22px * var(--fs, 1));height:calc(32px * var(--fs, 1));border-width:1.5px;border-radius:4px}
+.uc.sm b,.uc.sm u,.uc.sm em{display:none}
+.uc.xs{width:calc(28px * var(--fs, 1));height:calc(40px * var(--fs, 1));border-width:1.5px;border-radius:5px}
+.uc.xs b{font-size:calc(14px * var(--fs, 1))}.uc.xs u,.uc.xs em{display:none}
+.uc.big{width:calc(64px * var(--fs, 1));height:calc(92px * var(--fs, 1));border-radius:10px}
+.uc.big b{font-size:calc(32px * var(--fs, 1))}.uc.big u{font-size:calc(12px * var(--fs, 1))}.uc.big em{font-size:calc(10px * var(--fs, 1))}
+.uc.pop{animation:unpop .28s ease-out}
+@keyframes unpop{from{transform:translateY(-10px) scale(.85);opacity:0}to{transform:none;opacity:1}}
+.un-top{text-align:center;color:var(--mut);font-size:calc(12px * var(--fs, 1))}
+.un-mid{display:flex;align-items:center;justify-content:center;gap:18px;background:radial-gradient(ellipse at center,var(--card2) 0%,var(--card) 80%);border:1px solid var(--line);border-radius:22px;padding:12px 8px}
+.un-pile{background:none;padding:0;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--mut);font-size:calc(11px * var(--fs, 1));border-radius:10px}
+.un-pile[disabled]{opacity:1}
+.un-pile.go .uc{box-shadow:0 0 0 3px var(--gold),0 0 16px #f4c13d88;animation:nudge 1.6s ease-in-out infinite}
+.un-disc{display:flex;flex-direction:column;align-items:center;gap:4px}
+.un-ring{border:4px solid var(--kc);border-radius:16px;padding:3px;box-shadow:0 0 14px color-mix(in srgb,var(--kc) 60%,transparent)}
+.un-colname{font-size:calc(12px * var(--fs, 1));color:var(--mut)}
+.un-info{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:54px;color:var(--mut)}
+.un-info .dirb{font-size:calc(34px * var(--fs, 1));color:var(--gold);line-height:1}
+.un-info small{font-size:calc(10px * var(--fs, 1));text-align:center}
+.pendb{margin-top:4px;padding:2px 10px;border-radius:999px;background:var(--red);color:#fff;font-weight:800}
+.un-say{min-height:2.6em;text-align:center;color:var(--txt);font-size:calc(14px * var(--fs, 1));display:flex;align-items:center;justify-content:center}
+.un-act{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.un-act button{padding:15px 6px;font-weight:700;font-size:calc(16px * var(--fs, 1));min-width:0}
+.un-act .a-take{background:var(--gold);color:var(--on-gold)}
+.un-act .a-pass{background:var(--card2)}.un-act .a-ret{background:var(--blue);color:var(--on-blue)}
+.un-act button[disabled]{opacity:.35}
+.un-act .sug,.un-learn .sug{outline:3px solid var(--ok);outline-offset:2px;animation:pksug 1.2s ease-in-out infinite}
+@keyframes pksug{50%{outline-color:transparent}}
+.un-act2{display:flex;gap:8px;flex-wrap:wrap}.un-act2 button{flex:1;padding:14px 8px;font-weight:800;font-size:calc(17px * var(--fs, 1))}
+.a-uno{background:var(--red);color:#fff}.a-uno small{display:block;font-size:calc(11px * var(--fs, 1));font-weight:500;opacity:.9}
+.a-uno.on{background:var(--ok);color:#06210f}
+.un-pick{background:var(--card);border-radius:14px;padding:10px;text-align:center}
+.un-cols{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
+.un-cb{background:var(--kc);color:#fff;font-weight:800;padding:18px 4px;font-size:calc(17px * var(--fs, 1))}
+.un-cb.k1{color:#2a1e00}
+.un-tg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
+.un-tg small{color:var(--mut)}
+.un-me{background:var(--card);border-radius:14px;padding:8px 8px 10px}
+.un-mn{text-align:center;color:var(--mut);font-size:calc(13px * var(--fs, 1));margin-bottom:8px}.un-mn b{color:var(--txt)}
+.un-hand{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.hc{padding:0;background:none;border-radius:9px;transition:transform .12s}
+.hc .uc{width:calc(54px * var(--fs, 1));height:calc(78px * var(--fs, 1))}
+.hc.ok{transform:translateY(-6px)}
+.hc.ok .uc{box-shadow:0 0 0 2px var(--gold),0 3px 8px #0008}
+.hc.no{opacity:.5}
+.hc.sug{outline:3px solid var(--ok);outline-offset:2px;animation:pksug 1.2s ease-in-out infinite}
+.un-learn{background:var(--card);border:1px solid var(--ok);border-radius:14px;padding:10px 12px;line-height:1.45}
+.un-learn .lmano span{white-space:nowrap;margin-right:6px}
+.un-learn .adv{margin-top:8px;padding:8px 10px;border-radius:10px;background:var(--bg)}
+.un-learn .adv div{margin-top:4px}
+.un-lt{background:var(--card);border-radius:12px;padding:10px 12px!important;border:0!important}
+.un-res .rl{padding:7px 0;border-top:1px solid var(--line)}.un-res .rl:first-of-type{border-top:0}
+.un-res .rl small{color:var(--mut)}.un-res .rl.w{color:var(--gold)}
+.rcs{display:flex;flex-wrap:wrap;gap:3px;margin-top:5px}
+.btn-ghost.sm,.btn-gold.sm{padding:8px 14px;font-size:calc(14px * var(--fs, 1))}
+.hrow .res{font-weight:800;padding:2px 10px;border-radius:999px;background:var(--card2);white-space:nowrap}
+.hrow .res.w{background:var(--gold);color:var(--on-gold)}
+.stat4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
+.stat4 div{background:var(--card);border-radius:12px;padding:10px 4px;text-align:center}
+.stat4 b{display:block;font-size:calc(22px * var(--fs, 1));color:var(--gold)}.stat4 span{font-size:calc(11px * var(--fs, 1));color:var(--mut)}
+@media (min-width: 700px){.un-opps{grid-template-columns:repeat(5,1fr)}.un-hand{gap:8px}}
+
+</style>
+</head>
+<body>
+<header>
+  <h1 id="title">UNO<small id="subtitle"></small></h1>
+  <button class="icon" id="menuBtn" aria-label="Menú">⋮</button>
+</header>
+<div id="updBanner" role="button"></div>
+<main id="app"></main>
+<div id="modal" class="modal hidden"></div>
+<div id="toast"></div>
+
+<script src="uno.js"></script>
+<script src="juego.js"></script>
+<script>window.APP_ID = 'uno';</script>
+<script src="i18n-en.js"></script>
+<script src="i18n-fr.js"></script>
+<script src="i18n-de.js"></script>
+<script src="i18n-it.js"></script>
+<script src="idioma.js"></script>
+<script src="masjuegos.js"></script>
+<script src="audio-suave.js"></script>
+<script src="turno.js"></script>
+<script src="contador.js"></script>
+<script src="invitacion.js"></script>
+<script src="publicas.js"></script>
+<script>
+'use strict';
+/* ================= Estado y persistencia ================= */
+const KEY = 'uno.v1';
+const DONATE_URL = 'https://www.paypal.com/ncp/payment/KJCPZWMUM3JXG';
+// En la app Android (Capacitor) la navegación a otra web se abre en el navegador del sistema
+function openExternal(url) {
+  if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) { location.href = url; return; }
+  const w = window.open(url, '_blank', 'noopener');
+  if (!w) location.href = url;
+}
+/* ================= Temas de color ================= */
+const THEMES = {
+  madera:   { name: 'Madera',    bg:'#1c130b', felt:'#2c1e12', card:'#3a2918', card2:'#4a3520', line:'#654a2c', txt:'#f8efe3', mut:'#cdb89d', gold:'#f4c13d', onGold:'#2a1e00', red:'#ff7166', blue:'#71c2f0', onBlue:'#06233a', ok:'#74d39a', outbg:'#2b2620' },
+  burdeos:  { name: 'Burdeos',   bg:'#22090e', felt:'#3a141b', card:'#4a1a23', card2:'#5c222d', line:'#7a2f3c', txt:'#f7ece4', mut:'#d0aeb0', gold:'#f0c060', onGold:'#2a1e00', red:'#ff7a6b', blue:'#7cc0f0', onBlue:'#06233a', ok:'#7ad69c', outbg:'#2e2a2b' },
+  noche:    { name: 'Noche',     bg:'#121c27', felt:'#1b2a3a', card:'#22364a', card2:'#2b445c', line:'#3a5873', txt:'#f1f4f8', mut:'#a3b3c4', gold:'#f2b84b', onGold:'#2a1a00', red:'#ff6b6b', blue:'#6cc4e8', onBlue:'#062a33', ok:'#62d39a', outbg:'#262a33' },
+  tapete:   { name: 'Tapete',    bg:'#0b2a20', felt:'#0e3b2c', card:'#134a37', card2:'#1a5a43', line:'#2a6b52', txt:'#f3efe2', mut:'#a9c3b6', gold:'#e8b84a', onGold:'#2a1e00', red:'#e2574c', blue:'#5aa9e6', onBlue:'#06233a', ok:'#62c98a', outbg:'#2b2b2b' },
+  morado:   { name: 'Morado',    bg:'#160d22', felt:'#24163a', card:'#2f1d4b', card2:'#3b265e', line:'#4f3779', txt:'#f3eefa', mut:'#b6a8cc', gold:'#ffb547', onGold:'#2a1600', red:'#ff6b81', blue:'#7fb8ff', onBlue:'#06233a', ok:'#6fe0a4', outbg:'#2a2730' },
+  grafito:  { name: 'Grafito',   bg:'#121212', felt:'#1c1c1e', card:'#26262a', card2:'#323238', line:'#46464c', txt:'#f2f2f2', mut:'#a8a8ad', gold:'#4fc3f7', onGold:'#00222f', red:'#ff6b6b', blue:'#9fa8ff', onBlue:'#0d1033', ok:'#69db7c', outbg:'#1a1a1a' },
+  claro:    { name: 'Claro',     bg:'#f1eee6', felt:'#ffffff', card:'#ffffff', card2:'#e8e3d6', line:'#d6cfbd', txt:'#1d2a24', mut:'#66716b', gold:'#1f7a55', onGold:'#ffffff', red:'#c0392b', blue:'#2a73c2', onBlue:'#ffffff', ok:'#2e9e62', outbg:'#e2ded3' },
+  contraste:{ name: 'Alto contraste', bg:'#000000', felt:'#000000', card:'#111111', card2:'#222222', line:'#777777', txt:'#ffffff', mut:'#dddddd', gold:'#ffdd00', onGold:'#000000', red:'#ff4d4d', blue:'#00c8ff', onBlue:'#000000', ok:'#00e676', outbg:'#1a1a1a' }
+};
+function applyTheme(key) {
+  const t = THEMES[key] || THEMES.noche, r = document.documentElement.style;
+  const map = { bg:'--bg', felt:'--felt', card:'--card', card2:'--card2', line:'--line', txt:'--txt', mut:'--mut', gold:'--gold', onGold:'--on-gold', red:'--red', blue:'--blue', onBlue:'--on-blue', ok:'--ok', outbg:'--outbg' };
+  for (const k in map) r.setProperty(map[k], t[k]);
+  document.documentElement.style.colorScheme = key === 'claro' ? 'light' : 'dark';
+  const m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', t.felt);
+  // En la app Android, el fondo de las barras del sistema sigue al tema
+  try { const U = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.AppUpdater; if (U && U.setSystemBars) U.setSystemBars({ color: t.felt, light: key === 'claro' }).catch(() => {}); } catch (e) {}
+}
+const FONT_SIZES = [['1', 'Normal'], ['1.15', 'Grande'], ['1.3', 'Muy grande']];
+function applyFont() {
+  const z = parseFloat(S.fontScale) || 1;
+  document.documentElement.style.setProperty('--fs', z);
+}
+function openThemes() {
+  const cur = S.theme || 'noche';
+  openModal(`<h3>🎨 Aspecto y sonido</h3>
+    <label class="f"><span>Velocidad de la máquina<em>Cuánto tarda en jugar la máquina</em></span><span class="kinds" style="flex:none;width:50%;margin:0">${[['normal', 'Normal'], ['rapida', 'Rápida']].map(([v, l]) => `<button data-speed="${v}" class="${(S.speed || 'normal') === v ? 'on' : ''}">${l}</button>`).join('')}</span></label>
+    <label class="f" style="margin-bottom:10px"><span>Sonidos<em>Cartas, UNO y fin de mano</em></span><input type="checkbox" class="tg" id="thSound" ${S.sound !== false ? 'checked' : ''}></label>
+    ${AvisoTurno.opcionHtml()}
+    <h3>🔠 Tamaño de letra</h3>
+    <div class="kinds" style="margin:6px 0 16px">${FONT_SIZES.map(([v, l]) => `<button data-fs="${v}" class="${String(S.fontScale || '1') === v ? 'on' : ''}" style="font-size:${13 * parseFloat(v)}px">${l}</button>`).join('')}</div>
+    <h3>🎨 Colores de la app</h3><div class="sub">Toca un tema y se aplica al momento.</div>
+    <div class="themes">${Object.entries(THEMES).map(([k, t]) => `
+      <button class="th ${k === cur ? 'on' : ''}" data-theme="${k}" style="background:${t.card}">
+        <div class="pv" style="background:${t.bg}"><i style="background:${t.card}"></i><i style="background:${t.card2}"></i><b style="background:${t.gold}"></b></div>
+        <div class="tn" style="color:${t.txt}">${esc(t.name)}<span style="color:${t.gold}">${k === cur ? '✓' : ''}</span></div>
+      </button>`).join('')}</div>
+    <div class="acts"><button class="btn-gold" id="thOk">Listo</button></div>`);
+  document.querySelectorAll('[data-theme]').forEach(b => b.onclick = () => { S.theme = b.dataset.theme; applyTheme(S.theme); save(); openThemes(); });
+  document.querySelectorAll('[data-fs]').forEach(b => b.onclick = () => { S.fontScale = b.dataset.fs; applyFont(); save(); openThemes(); });
+  document.querySelectorAll('[data-speed]').forEach(b => b.onclick = () => { S.speed = b.dataset.speed; save(); openThemes(); });
+  $('#thSound').onchange = e => { S.sound = e.target.checked; save(); if (S.sound) Sound.play('card'); };
+  $('#thOk').onclick = closeModal;
+  AvisoTurno.enlazar();
+}
+
+const APP_VERSION = '1.0.0';
+const REPO = 'csuarezsm/Uno';
+const MAX_ARCHIVE = 500;
+const uid = () => Math.random().toString(36).slice(2, 10);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $ = s => document.querySelector(s);
+const nkey = n => String(n || '').trim().toLowerCase();
+const pad2 = n => String(n).padStart(2, '0');
+const isNative = () => !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+const num = (v, d) => { const n = Number(v); return Number.isFinite(n) ? Math.round(n) : d; };
+const clampN = (v, a, b, d) => Math.max(a, Math.min(b, num(v, d)));
+const cleanName = n => String(n == null ? '' : n).replace(/[<>"'`\u0000-\u001f]/g, '').trim().slice(0, 24);
+const SAFE_ID = /^[A-Za-z0-9_-]{1,40}$/;
+
+function load() { try { return JSON.parse(localStorage.getItem(KEY)) || null; } catch (e) { return null; } }
+let saveWarned = false;
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify(S)); saveWarned = false; }
+  catch (e) { if (!saveWarned) { saveWarned = true; setTimeout(() => toast('⚠️ No se pudo guardar. Exporta una copia y borra partidas antiguas.'), 0); } }
+}
+const DEF_DRAFT = () => ({ mode: 'ai', ai: { name: '', rivals: 3, level: 2, learn: false, meta: 500, acum: false, siete0: false, penal: 4 } });
+let S = load() || {};
+S.game = S.game || null;
+S.draft = Object.assign(DEF_DRAFT(), S.draft || {});
+S.draft.ai = Object.assign(DEF_DRAFT().ai, S.draft.ai || {});
+S.archive = Array.isArray(S.archive) ? S.archive : [];
+
+/* ================= Utilidades UI ================= */
+let toastT;
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 2200); }
+function vibrate(ms) { try { navigator.vibrate && navigator.vibrate(ms); } catch (e) {} }
+let modalOnClose = null;
+function openModal(html) { const m = $('#modal'); modalOnClose = null; m.innerHTML = '<div class="sheet">' + html + '</div>'; m.classList.remove('hidden'); }
+function closeModal() { const m = $('#modal'); m.classList.add('hidden'); m.innerHTML = ''; const f = modalOnClose; modalOnClose = null; if (f) f(); }
+$('#updBanner').onclick = () => openUpdAvail();
+$('#modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
+function confirmBox(title, text, okLabel, onOk, danger) {
+  openModal(`<h3>${esc(title)}</h3><div class="sub">${esc(text)}</div>
+    <div class="acts"><button class="btn-ghost" id="cNo">Cancelar</button><button class="${danger ? 'btn-red' : 'btn-gold'}" id="cOk">${esc(okLabel)}</button></div>`);
+  $('#cNo').onclick = closeModal;
+  $('#cOk').onclick = () => { closeModal(); onOk(); };
+}
+/* Mantener la pantalla encendida durante la partida */
+let wakeLock = null;
+async function keepAwake() {
+  try { if ((S.game || (typeof ON !== 'undefined' && ON.sala)) && 'wakeLock' in navigator && !wakeLock) { wakeLock = await navigator.wakeLock.request('screen'); wakeLock.addEventListener('release', () => wakeLock = null); } } catch (e) {}
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') keepAwake(); });
+
+/* ================= Render principal ================= */
+function render() {
+  save();
+  if (S.game) renderGame();
+  else renderSetup();
+}
+
+/* ---------- Historial de partidas ---------- */
+const MEDALS = ['🥇', '🥈', '🥉'];
+function archiveRow(a, i) {
+  const dt = new Date(a.finished || a.created);
+  const pos = a.place || 0;
+  const who = (a.orden || []).slice(0, 3).map((k, j) => MEDALS[j] + (k === a.yo ? 'Tú' : (a.bots && a.bots[k] ? '🤖' : '') + (a.nombres[k] || '')) ).join(' ');
+  return `<div class="hrow"><div class="top"><div class="n">${esc(who)}<small>${dt.toLocaleDateString('es-ES')} ${dt.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })} · ${a.mode === 'online' ? 'en línea' : 'contra la máquina'} · ${a.n} jugadores · ${a.manos} ${a.manos === 1 ? 'mano' : 'manos'}${a.meta ? ' · a ' + a.meta : ''}${a.learn ? ' · 💡' : ''}</small></div><span class="res ${pos === 1 ? 'w' : ''}">${pos === 1 ? '🏆 1º' : pos + 'º'}</span></div></div>`;
+}
+function openArchive() {
+  const A = S.archive.filter(a => a.place > 0);
+  const wins = A.filter(a => a.place === 1).length, pod = A.filter(a => a.place <= 3).length;
+  const best = A.length ? Math.min(...A.map(a => a.place)) : null;
+  const avg = A.length ? (A.reduce((t, a) => t + a.place / a.n, 0) / A.length) : null;
+  openModal(`<h3>📊 Historial y estadísticas</h3>
+    <div class="sub">Tus partidas terminadas, en este móvil.</div>
+    ${A.length ? `<div class="stat4"><div><b>${A.length}</b><span>partidas</span></div><div><b>${wins}</b><span>victorias</span></div><div><b>${Math.round(100 * pod / A.length)}%</b><span>en el podio</span></div><div><b>${best}º</b><span>mejor puesto</span></div></div>` : ''}
+    ${S.archive.slice(0, 60).map(archiveRow).join('') || '<div class="empty">Aún no has terminado ninguna partida.</div>'}
+    <div class="acts"><button class="btn-ghost" id="arBk">💾 Copia de seguridad</button><button class="btn-gold" id="arOk">Cerrar</button></div>`);
+  $('#arOk').onclick = closeModal;
+  $('#arBk').onclick = () => exportBackup();
+}
+
+
+/* ---------- Tienda: GitHub (actualizador propio) o Google Play ---------- */
+let STORE = 'github';
+const PLAY_URL = 'https://play.google.com/store/apps/details?id=com.itcanarias.uno';
+const storeReady = (async () => {
+  try { const U = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.AppUpdater; if (U && U.info) { const r = await U.info(); if (r && r.store === 'play') STORE = 'play'; } } catch (e) {}
+})();
+const isPlay = () => STORE === 'play';
+/* ---------- Actualizaciones ---------- */
+function cmpVer(a, b) { const x = a.split('.').map(Number), y = b.split('.').map(Number); for (let i = 0; i < 3; i++) { const d = (x[i] || 0) - (y[i] || 0); if (d) return d; } return 0; }
+async function checkUpdates(manual) {
+  if (manual) openModal('<h3>🔄 Buscando actualizaciones…</h3><div class="sub">Un momento.</div>');
+  try {
+    const r = await fetch('https://api.github.com/repos/' + REPO + '/releases/latest', { cache: 'no-store', headers: { Accept: 'application/vnd.github+json' } });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const j = await r.json();
+    const v = String(j.tag_name || '').replace(/^v/, '');
+    const apk = (j.assets || []).find(a => /\.apk$/i.test(a.name));
+    S.lastUpdateCheck = Date.now(); save();
+    if (!/^\d+\.\d+\.\d+$/.test(v) || !apk) { if (manual) showUpdMsg('No hay ninguna versión publicada todavía.'); return; }
+    if (cmpVer(v, APP_VERSION) > 0) {
+      S.updAvail = { v, url: apk.browser_download_url, page: j.html_url, note: (j.body || '').split('\n')[0] }; save(); refreshUpdBadge();
+      // el aviso grande sale solo una vez por versión; la marca se queda hasta actualizar
+      const busy = !$('#modal').classList.contains('hidden');
+      if (manual || (!busy && S.updNotified !== v)) { S.updNotified = v; save(); openUpdAvail(); }
+    } else {
+      S.updAvail = null; save(); refreshUpdBadge();
+      if (manual) showUpdMsg(`Tienes la última versión (v${APP_VERSION}).`, '✅');
+    }
+  } catch (e) {
+    if (manual) showUpdMsg('No se pudo comprobar. Revisa que tengas conexión a internet.', '⚠️');
+  }
+}
+function hasUpd() { return !isPlay() && isNative() && !!(S.updAvail && cmpVer(S.updAvail.v, APP_VERSION) > 0); }
+function openUpdAvail() { if (hasUpd()) showUpdate(S.updAvail.v, S.updAvail.url, S.updAvail.page, S.updAvail.note); }
+function refreshUpdBadge() {
+  const on = hasUpd();
+  $('#menuBtn').classList.toggle('dot', on);
+  const b = $('#updBanner');
+  b.classList.toggle('on', on);
+  if (on) b.innerHTML = `🎉 Nueva versión v${esc(S.updAvail.v)} disponible · <u>Actualizar</u>`;
+}
+async function autoCheckUpdates() {
+  await storeReady;
+  if (isPlay()) { if (S.updAvail) { S.updAvail = null; save(); refreshUpdBadge(); } return; }
+  if (!isNative() || !navigator.onLine) return;
+  if (!S.lastUpdateCheck || Date.now() - S.lastUpdateCheck > 3600e3) checkUpdates(false);
+}
+function showUpdMsg(t, icon) { openModal(`<h3>${icon || 'ℹ️'} Actualizaciones</h3><div class="sub">${esc(t)}</div><div class="acts"><button class="btn-gold" id="uOk">Vale</button></div>`); $('#uOk').onclick = closeModal; }
+function showUpdate(v, url, page, note) {
+  openModal(`<h3>🎉 Nueva versión disponible</h3>
+    <div class="sub">Tienes la v${APP_VERSION} y ya está la <b>v${esc(v)}</b>.${note ? '<br>' + esc(note.replace(/^v[\d.]+:\s*/, 'Novedades: ')) : ''}<br><br>Tus partidas, el historial y los colores se conservan.</div>
+    <div id="uProg" class="mut" style="min-height:1.2em"></div>
+    <div class="acts"><button class="btn-ghost" id="uLater">Más tarde</button><button class="btn-gold" id="uGo">Actualizar ahora</button></div>`);
+  $('#uLater').onclick = closeModal;
+  $('#uGo').onclick = () => installUpdate(url, page);
+}
+async function installUpdate(url, page) {
+  if (!String(url).startsWith('https://github.com/' + REPO + '/releases/download/')) { toast('Descarga no válida'); return; }
+  const U = isNative() && window.Capacitor.Plugins && window.Capacitor.Plugins.AppUpdater;
+  if (!U) { openExternal(page || ('https://github.com/' + REPO + '/releases/latest')); return; }
+  const prog = $('#uProg'), go = $('#uGo');
+  try {
+    const { allowed } = await U.canInstall();
+    if (!allowed) {
+      openModal(`<h3>Un permiso, solo la primera vez</h3><div class="sub">Android necesita que permitas a UNO instalar su actualización.<br><br>Pulsa <b>Abrir ajustes</b>, activa <b>«Permitir de esta fuente»</b>, vuelve atrás y pulsa otra vez <b>Actualizar</b>.</div>
+        <div class="acts"><button class="btn-ghost" id="pNo">Cancelar</button><button class="btn-gold" id="pSet">Abrir ajustes</button></div>`);
+      $('#pNo').onclick = closeModal;
+      $('#pSet').onclick = async () => { closeModal(); try { await U.openInstallSettings(); } catch (e) { toast('Ábrelo en Ajustes → Aplicaciones → UNO'); } };
+      return;
+    }
+    go.disabled = true; go.textContent = 'Descargando…'; prog.textContent = 'Descargando 0%';
+    const h = await U.addListener('progress', d => { prog.textContent = 'Descargando ' + d.pct + '%'; });
+    await U.downloadAndInstall({ url });
+    try { h.remove(); } catch (e) {}
+    prog.textContent = 'Descarga completa. Pulsa «Actualizar» en la ventana de Android.';
+    go.textContent = 'Actualizar ahora'; go.disabled = false;
+  } catch (e) {
+    prog.textContent = String(e && e.message || e);
+    go.textContent = 'Reintentar'; go.disabled = false;
+  }
+}
+
+
+/* ---------- Borrar datos ---------- */
+function openWipe() {
+  openModal(`<h3>🗑 Borrar datos</h3><div class="sub">Elige qué quieres borrar. No se puede deshacer, así que antes puedes guardar una copia.</div>
+    <div class="menu">
+      ${S.archive.length ? '<button id="wCopy">💾 Guardar una copia antes</button>' : ''}
+      <button id="wHist">Solo el historial de partidas<br><small class="mut">Se mantienen los ajustes y la partida en curso</small></button>
+      <button id="wAll" class="btn-red">Todo: dejar la app como nueva<br><small>Partida, historial, ajustes y copias automáticas</small></button>
+    </div>
+    <div class="acts"><button class="btn-ghost" id="wNo">Cancelar</button></div>`);
+  $('#wNo').onclick = closeModal;
+  const cp = $('#wCopy'); if (cp) cp.onclick = () => exportBackup();
+  $('#wHist').onclick = () => confirmBox('Borrar historial', `Se borrarán los ${S.archive.length} partidas guardadas.`, 'Borrar historial', () => { S.archive = []; save(); render(); toast('Historial borrado'); }, true);
+  $('#wAll').onclick = () => confirmBox('Borrar TODO', 'La app quedará como recién instalada. ¿Seguro?', 'Sí, borrar todo', () => confirmBox('Última confirmación', 'Se perderán la partida, el historial y los ajustes.', 'Borrar todo', wipeAll, true), true);
+}
+async function wipeAll() {
+  if (isNative()) {
+    const { Filesystem } = window.Capacitor.Plugins;
+    for (const [path, directory] of [[AUTO_FILE, 'DATA'], ['UNO/' + AUTO_FILE, 'DOCUMENTS']]) { try { await Filesystem.deleteFile({ path, directory }); } catch (e) {} }
+  }
+  try { localStorage.removeItem(KEY); localStorage.setItem(KEY, JSON.stringify({ restoreOffered: true, onboarded: true })); } catch (e) {}
+  location.reload();
+}
+
+/* ---------- Pantalla de bienvenida ---------- */
+const WELCOME = [
+  ['🃏', 'Bienvenido a UNO', 'El juego de cartas de colores: contra la máquina o en línea con amigos. Gratis, sin anuncios y sin cuentas.'],
+  ['🎯', 'Quedarte sin cartas', 'Cada uno recibe 7 cartas. En tu turno juegas una que coincida en color, número o símbolo con la de arriba; si no tienes, robas. Gana la mano quien se queda sin cartas y suma los puntos de las que tienen los demás.'],
+  ['🗣️', '¡Di UNO!', 'Cuando te queda una sola carta tienes que pulsar el botón ¡UNO!. Si otro jugador te pilla antes de que juegue el siguiente, robas cartas de castigo. ¡Tú también puedes pillar a los demás!'],
+  ['💡', 'Modo aprendizaje', 'Actívalo al empezar o en cualquier momento. Te explica qué cartas puedes jugar, cuál conviene y por qué. Nunca juega por ti.'],
+  ['🌐', 'Con amigos', 'Crea una partida en línea y pasa el código por WhatsApp: hasta 10 personas, cada una en su móvil. La máquina puede ocupar las sillas libres.']
+];
+function openWelcome(i) {
+  i = Math.max(0, Math.min(WELCOME.length - 1, i || 0));
+  const [ic, t, d] = WELCOME[i], last = i === WELCOME.length - 1;
+  openModal(`<div style="text-align:center;padding:10px 4px 0">
+      <div style="font-size:calc(64px * var(--fs, 1));line-height:1.2">${ic}</div>
+      <h3 style="margin:10px 0 8px;font-size:calc(22px * var(--fs, 1))">${esc(t)}</h3>
+      <div class="mut" style="font-size:calc(16px * var(--fs, 1));line-height:1.5;min-height:7em">${esc(d)}</div>
+      <div style="display:flex;justify-content:center;gap:6px;margin:14px 0 4px">${WELCOME.map((_, k) => `<i style="width:${k === i ? 20 : 8}px;height:8px;border-radius:4px;background:${k === i ? 'var(--gold)' : 'var(--line)'}"></i>`).join('')}</div>
+    </div>
+    <div class="acts">${i ? '<button class="btn-ghost" id="wbPrev">‹ Atrás</button>' : '<button class="btn-ghost" id="wbSkip">Saltar</button>'}<button class="btn-gold" id="wbNext">${last ? '¡A jugar!' : 'Siguiente ›'}</button></div>`);
+  const done = () => { S.onboarded = true; save(); closeModal(); openIOSInstall(false); };
+  const sk = $('#wbSkip'); if (sk) sk.onclick = done;
+  const pv = $('#wbPrev'); if (pv) pv.onclick = () => openWelcome(i - 1);
+  $('#wbNext').onclick = () => last ? done() : openWelcome(i + 1);
+}
+
+/* ---------- Reglas del juego ---------- */
+function openGameRules() {
+  openModal(`<h3>📖 Reglas de UNO</h3><div class="sub">Reglas oficiales de la hoja de instrucciones de Mattel, con opciones que puedes activar al crear la partida.</div><div class="rules">
+    <h4>Objetivo</h4><p>Ser el primero en quedarte sin cartas. Al ganar una mano sumas los puntos de las cartas que les quedan a los demás; gana la partida quien llega primero a la meta (500 puntos por defecto; también 200, 1000 o una sola mano).</p>
+    <h4>Cómo se juega</h4><ul>
+      <li>Cada jugador recibe <b>7 cartas</b>; se vuelve la primera del mazo para empezar el descarte (un +4 inicial se devuelve al mazo).</li>
+      <li>Por turno juegas <b>una carta</b> del mismo <b>color</b>, <b>número</b> o <b>símbolo</b> que la de arriba, o un comodín.</li>
+      <li>Si no tienes nada que jugar, <b>robas una</b>: si te sirve, puedes jugarla; si no, pasas.</li>
+      <li>El sentido empieza hacia la izquierda (horario) y se puede invertir.</li></ul>
+    <h4>Cartas de acción</h4><ul>
+      <li><b>Salta</b>: el siguiente pierde su turno.</li>
+      <li><b>Cambio de sentido</b>: se invierte el orden. Con dos jugadores funciona como Salta.</li>
+      <li><b>+2</b>: el siguiente roba 2 y pierde el turno.</li>
+      <li><b>Comodín</b>: eliges el color; se puede jugar siempre.</li>
+      <li><b>Comodín +4</b>: eliges color y el siguiente roba 4 y pierde el turno. Solo puedes jugarlo si <b>no tienes ninguna carta del color en juego</b>. Quien lo recibe puede <b>desafiarlo</b>: si no era legal, roba 4 quien lo jugó; si lo era, el desafiante roba 6 (4 + 2).</li></ul>
+    <h4>¡UNO!</h4><ul>
+      <li>Al quedarte con <b>una carta</b> tienes que decir UNO (botón ¡UNO!, antes de jugar tu penúltima carta o enseguida después).</li>
+      <li>Si otro jugador te <b>pilla</b> antes de que juegue el siguiente, robas cartas de castigo (4 según la hoja de Mattel; puedes elegir 2).</li></ul>
+    <h4>Puntos</h4><ul><li>Números: su valor · Salta, Cambio de sentido y +2: 20 · Comodines y +4: 50.</li></ul>
+    <h4>Opciones de la app</h4><ul>
+      <li><b>Acumular +2 y +4</b>: si te ponen un +2 (o +4) y tienes otro igual, puedes devolverlo y la cuenta suma. Es una regla de la casa, no oficial.</li>
+      <li><b>Regla del 7 y el 0</b>: con un 7 cambias tu mano por la de quien quieras; con un 0 todos pasan su mano en el sentido del juego. También regla de la casa.</li>
+      <li>No hay «saltar a la jugada»: solo se juega en tu turno. Cuando se acaba el mazo, se baraja el descarte.</li>
+      <li>En línea, el servidor baraja y reparte; si no juegas en el tiempo de la mesa, robas y pasas solo.</li></ul>
+  </div><div class="acts"><button class="btn-ghost" id="grHands">🃏 Qué hace cada carta</button><button class="btn-gold" id="grOk">Entendido</button></div>`);
+  $('#grOk').onclick = closeModal;
+  $('#grHands').onclick = openCards;
+}
+
+/* ---------- Compartir la app ---------- */
+const APK_URL = 'https://github.com/' + REPO + '/releases/latest/download/uno.apk';
+const WEB_URL = 'https://csuarezsm.github.io/Uno/app/';
+const DESCARGA_URL = 'https://csuarezsm.github.io/Uno/';
+const isIOS = () => /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const isStandalone = () => window.navigator.standalone === true || (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
+function openIOSInstall(force) {
+  if (!force && (!isIOS() || isStandalone() || isNative() || S.iosHint)) return false;
+  S.iosHint = true; save();
+  openModal(`<h3>📲 Instala UNO en tu iPhone</h3><div class="sub">Así tendrás su icono como cualquier app, funcionará sin conexión y tus partidas quedarán guardados.</div>
+    <ol class="rules" style="padding-left:22px;line-height:1.6"><li>Pulsa el botón <b>Compartir</b> de Safari (el cuadrado con la flecha hacia arriba).</li><li>Baja y elige <b>«Añadir a pantalla de inicio»</b>.</li><li>Abre la app desde el nuevo icono.</li></ol>
+    <div class="mut">Si solo la usas desde Safari y pasan semanas sin abrirla, iOS puede borrar sus datos. Para no perder nada: ⋮ → Historial → Copia de seguridad.</div>
+    <div class="acts"><button class="btn-gold" id="iosOk">Entendido</button></div>`);
+  $('#iosOk').onclick = closeModal;
+  return true;
+}
+async function shareApp() {
+  const text = '🃏 UNO — el juego de cartas de colores, contra la máquina o en línea con amigos, y con modo aprendizaje. Gratis y sin anuncios.\n\n'
+    + (isPlay()
+      ? '🤖 Android (Google Play): ' + PLAY_URL + '\n🍏 iPhone: ' + WEB_URL + '\n(en el iPhone, ábrelo en Safari y pulsa Compartir → «Añadir a pantalla de inicio»)'
+      : '📲 Descárgala aquí, para Android o iPhone:\n' + DESCARGA_URL + '\n\n🤖 Android: «Descargar para Android» (mejor desde Chrome).\n🍏 iPhone: se abre en Safari; pulsa Compartir → «Añadir a pantalla de inicio».');
+  try {
+    if (isNative()) { await window.Capacitor.Plugins.Share.share({ title: 'UNO', text, dialogTitle: 'Compartir la app' }); return; }
+    if (navigator.share) { await navigator.share({ title: 'UNO', text }); return; }
+    await navigator.clipboard.writeText(text); toast('Enlace copiado');
+  } catch (e) {
+    if (!/cancel|abort/i.test(String(e && (e.message || e.name)))) toast('No se pudo compartir');
+  }
+}
+
+/* ---------- Copia de seguridad ---------- */
+function backupJSON() {
+  return JSON.stringify({ app: 'uno', format: 1, version: APP_VERSION, exported: new Date().toISOString(), archive: S.archive, theme: S.theme, fontScale: S.fontScale, sound: S.sound, speed: S.speed, lastName: S.lastName, online: S.online && S.online.nombre ? { nombre: S.online.nombre } : undefined });
+}
+function cleanGameEntry(a) {
+  if (!a || typeof a !== 'object') return null;
+  const n = clampN(a.n, 2, 10, 0); if (!n) return null;
+  const nombres = Array.isArray(a.nombres) ? a.nombres.slice(0, n).map(x => cleanName(x)) : []; if (nombres.length !== n) return null;
+  const orden = Array.isArray(a.orden) ? a.orden.map(Number) : [];
+  if (orden.length !== n || new Set(orden).size !== n || !orden.every(k => Number.isInteger(k) && k >= 0 && k < n)) return null;
+  const created = num(a.created, Date.now());
+  return { id: SAFE_ID.test(String(a.id)) ? String(a.id) : uid(), created, finished: num(a.finished, created), mode: a.mode === 'online' ? 'online' : 'ai', level: clampN(a.level, 0, 3, 0), learn: !!a.learn, n, nombres,
+    bots: Array.isArray(a.bots) ? a.bots.slice(0, n).map(Boolean) : nombres.map(() => false), orden, yo: clampN(a.yo, 0, n - 1, 0), place: clampN(a.place, 0, n, 0), manos: clampN(a.manos, 0, 100000, 0), meta: [0, 200, 500, 1000].includes(num(a.meta, 500)) ? num(a.meta, 500) : 500 };
+}
+// Partida en curso guardada: solo si tiene la forma correcta
+function cleanLive(g) {
+  try {
+    if (!g || typeof g !== 'object' || !g.st || typeof g.st !== 'object') return null;
+    const t = g.st;
+    if (!Array.isArray(t.seats) || t.seats.length < 2 || t.seats.length > 10 || !Array.isArray(t.mazo) || !Array.isArray(t.desc)) return null;
+    if (!['jugando', 'ronda_fin', 'fin'].includes(t.fase)) return null;
+    if (!t.seats.every(s => s && Array.isArray(s.mano) && Number.isFinite(s.puntos) && s.mano.every(c => Number.isInteger(c) && c >= 0 && c < 80))) return null;
+    if (!(t.turno === null || (Number.isInteger(t.turno) && t.turno >= 0 && t.turno < t.seats.length))) return null;
+    if (!t.cfg || ![0, 200, 500, 1000].includes(t.cfg.meta) || !Number.isInteger(t.top) || !(t.color >= 0 && t.color <= 3) || (t.dir !== 1 && t.dir !== -1)) return null;
+    return g;
+  } catch (e) { return null; }
+}
+function mergeBackup(b) {
+  const have = new Set(S.archive.map(a => a.id));
+  const nuevas = b.archive.slice(0, MAX_ARCHIVE).map(cleanGameEntry).filter(a => a && !have.has(a.id));
+  S.archive = S.archive.concat(nuevas).sort((x, y) => (y.finished || 0) - (x.finished || 0)).slice(0, MAX_ARCHIVE);
+  if (!S.theme && THEMES[b.theme]) { S.theme = b.theme; applyTheme(S.theme); }
+  if (!S.fontScale && FONT_SIZES.some(f => f[0] === String(b.fontScale))) { S.fontScale = String(b.fontScale); applyFont(); }
+  if (!S.lastName && b.lastName) S.lastName = cleanName(b.lastName);
+  if (b.online && b.online.nombre && !(S.online && S.online.nombre)) { S.online = S.online || {}; S.online.nombre = cleanName(b.online.nombre).slice(0, 18); }
+  return nuevas.length;
+}
+const validBackup = b => b && b.app === 'uno' && Array.isArray(b.archive);
+
+/* Copia automática (solo app Android): memoria interna de la app (Android la incluye en su copia de Google) y Documentos/UNO */
+const AUTO_FILE = 'uno-copia-auto.json';
+let autoBackupBusy = false;
+async function autoBackup(force) {
+  if (!isNative() || autoBackupBusy) return;
+  if (!S.archive.length) return;
+  if (!force && S.lastAutoBackup && Date.now() - S.lastAutoBackup < 3600e3) return;
+  autoBackupBusy = true;
+  try {
+    const { Filesystem } = window.Capacitor.Plugins, data = backupJSON();
+    await Filesystem.writeFile({ path: AUTO_FILE, data, directory: 'DATA', encoding: 'utf8' });
+    try { await Filesystem.writeFile({ path: 'UNO/' + AUTO_FILE, data, directory: 'DOCUMENTS', encoding: 'utf8', recursive: true }); S.autoBackupDocs = true; }
+    catch (e) { S.autoBackupDocs = false; }
+    S.lastAutoBackup = Date.now(); save();
+  } catch (e) { /* se reintenta más tarde */ }
+  autoBackupBusy = false;
+}
+async function offerRestore() {
+  if (!isNative() || S.archive.length || S.game || S.restoreOffered) return;
+  const { Filesystem } = window.Capacitor.Plugins;
+  let b = null;
+  for (const [path, directory] of [[AUTO_FILE, 'DATA'], ['UNO/' + AUTO_FILE, 'DOCUMENTS']]) {
+    try { const r = await Filesystem.readFile({ path, directory, encoding: 'utf8' }); const j = JSON.parse(r.data); if (validBackup(j) && j.archive.length) { b = j; break; } } catch (e) {}
+  }
+  S.restoreOffered = true; save();
+  if (!b) return;
+  const when = new Date(b.exported).toLocaleString('es-ES', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
+  confirmBox('Recuperar tu historial', `Hay una copia de seguridad del ${when} con ${b.archive.length} partida${b.archive.length === 1 ? '' : 's'}. ¿Quieres recuperarla?`, 'Recuperar', () => {
+    const n = mergeBackup(b); save(); render(); toast(n + ' partidas recuperadas');
+  });
+}
+async function exportBackup() {
+  const d = new Date(), stamp = d.getFullYear() + pad2(d.getMonth() + 1) + pad2(d.getDate()) + '-' + pad2(d.getHours()) + pad2(d.getMinutes());
+  const name = 'uno-copia-' + stamp + '.json', data = backupJSON();
+  try {
+    if (isNative()) {
+      const { Filesystem, Share } = window.Capacitor.Plugins;
+      const r = await Filesystem.writeFile({ path: name, data, directory: 'CACHE', encoding: 'utf8' });
+      await Share.share({ title: 'Copia de UNO', text: 'Copia de seguridad de UNO', files: [r.uri], dialogTitle: 'Guardar copia de seguridad' });
+    } else {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([data], { type: 'application/json' }));
+      a.download = name; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+      toast('Copia descargada');
+    }
+  } catch (e) { if (!/cancel/i.test(String(e && e.message))) toast('No se pudo exportar la copia'); }
+}
+function importBackup() {
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'application/json,.json,text/plain';
+  inp.onchange = () => {
+    const f = inp.files && inp.files[0]; if (!f) return;
+    const rd = new FileReader();
+    rd.onload = () => {
+      let b; try { b = JSON.parse(rd.result); } catch (e) { b = null; }
+      if (!validBackup(b)) { toast('Ese archivo no es una copia de UNO'); return; }
+      const have = new Set(S.archive.map(a => a.id));
+      const nuevas = b.archive.slice(0, MAX_ARCHIVE).map(cleanGameEntry).filter(a => a && !have.has(a.id));
+      confirmBox('Importar copia', `Se añadirán ${nuevas.length} partida${nuevas.length === 1 ? '' : 's'} nueva${nuevas.length === 1 ? '' : 's'} al historial (los que ya tienes no se duplican).`, 'Importar', () => {
+        const n = mergeBackup(b); save(); render(); toast(n + ' partidas importadas'); autoBackup(true);
+      });
+    };
+    rd.readAsText(f);
+  };
+  inp.click();
+}
+
+/* ---------- Menú ---------- */
+$('#menuBtn').onclick = () => {
+  const g = S.game, live = g && g.st.fase !== 'fin', onl = !g && ON.sala && ON.sala.estado === 'jugando';
+  openModal(`<h3>Menú</h3><div class="menu">
+      ${(() => { const h = `${live || onl ? `<button id="mLeave">🚪 Salir de la partida</button>` : ''}
+      ${g && !live ? '<button id="mNew" class="btn-gold">✚ Nueva partida</button>' : ''}`; return h.trim() ? '<div class="mt">Esta partida</div>' + h : ''; })()}
+      <div class="mt">Partidas</div>
+      <button id="mArch">📊 Historial y estadísticas</button>
+      <div class="mt">Ajustes y ayuda</div>
+      <div class="mg2"><button id="mTheme">🎨 Colores y sonido</button><button id="mLang">🌐 Idioma · Language</button><button id="mHelp">❓ Cómo se usa</button><button id="mGameRules">📖 Reglas de UNO</button><button id="mHands">🃏 Las cartas</button><button id="mWipe">🗑 Borrar datos</button></div>
+      <div class="mt">La app</div>
+      ${isIOS() && !isStandalone() && !isNative() ? '<button id="mIOS" class="btn-gold">📲 Instalar en el iPhone</button>' : ''}
+      ${isPlay() || !isNative() ? '' : hasUpd() ? `<button id="mUpd" class="btn-gold">🎉 Actualizar a v${esc(S.updAvail.v)} (nueva)</button>` : '<button id="mUpd">🔄 Buscar actualizaciones</button>'}
+      <div class="mg2"><button id="mShareApp">📲 Compartir la app</button><button id="mMas">🎲 Más juegos de IT Canarias</button><button id="mAbout">ℹ️ Acerca de</button><button id="mImp">📥 Importar copia</button></div>
+      <button class="btn-ghost" id="mClose">Cerrar</button></div>`);
+  const on = (id, fn) => { const el = $('#' + id); if (el) el.onclick = fn; };
+  on('mClose', closeModal);
+  on('mHelp', () => openWelcome(0));
+  on('mGameRules', openGameRules);
+  on('mHands', openCards);
+  on('mWipe', openWipe);
+  on('mTheme', openThemes);
+  on('mUpd', () => hasUpd() ? openUpdAvail() : checkUpdates(true));
+  on('mLang', () => Idioma.elegir());
+  on('mMas', () => MasJuegos.abrir());
+  on('mShareApp', () => { closeModal(); shareApp(); });
+  on('mIOS', () => openIOSInstall(true));
+  on('mImp', () => { closeModal(); importBackup(); });
+  on('mArch', openArchive);
+  on('mNew', () => { closeModal(); S.game = null; render(); });
+  on('mLeave', () => S.game ? openLeave() : leaveOnline());
+  on('mAbout', () => {
+    openModal(`<h3>UNO</h3>
+      <div class="sub">v${APP_VERSION}<br>© 2026 IT Canarias. Todos los derechos reservados.<br>itcanarias.com<br><br>Reglas y máquina propias de IT Canarias. Juego de entretenimiento sin apuestas. App independiente de IT Canarias: no está afiliada a Mattel; UNO® es marca de sus propietarios.</div>
+      <details class="hrow" style="margin-bottom:10px"><summary style="cursor:pointer;font-weight:700">🔒 Privacidad</summary>
+        <div class="mut" style="margin-top:8px;line-height:1.5">
+        • Tus partidas y ajustes se guardan <b>solo en este móvil</b>. No hay cuentas ni registro.<br>
+        • La app <b>no recoge ningún dato personal</b> ni de uso, y no lleva anuncios ni rastreadores.<br>
+        ${!isNative() ? '• Esta es la <b>versión web</b>: se carga desde GitHub Pages (csuarezsm.github.io) y se actualiza sola al abrirla, sin enviar ningún dato tuyo. Instalada en la pantalla de inicio funciona sin conexión.<br>' : ''}
+        ${ONLINE_URL ? '• Solo si juegas <b>en línea</b>, se envían al servidor de juegos de IT Canarias el nombre que pones y tus jugadas, para la partida (el mazo lo baraja el servidor y solo te manda tus cartas). No se guarda nada más.<br>' : ''}
+        • La copia de seguridad automática se queda en el móvil; Android puede incluirla en tu copia de Google si la tienes activada.<br>
+        • Al instalarla y al actualizarla, la app avisa de forma <b>anónima</b> al servidor de IT Canarias para contar instalaciones: solo el juego, el tipo de app (Android, iPhone o web) y la versión. Sin IP ni identificador.<br>
+        • Responsable: IT Canarias · itcanarias.com</div></details>
+      ${isPlay() ? '' : `<div class="donate">
+        <div class="dt">💛 Apoya el desarrollo de esta app</div>
+        <div class="dd">Es gratis y sin anuncios. Con 1&nbsp;€ nos ayudas a seguir mejorándola y a crear nuevas apps como esta. ¡Gracias!</div>
+        <button class="btn-gold" id="donate">Apoyar con 1 € (PayPal)</button>
+      </div>`}
+      <div class="acts"><button class="btn-ghost" id="ok">Cerrar</button></div>`);
+    $('#ok').onclick = closeModal;
+    if ($('#donate')) $('#donate').onclick = () => openExternal(DONATE_URL);
+  });
+};
+
+function openLeave() {
+  openModal(`<h3>🚪 Salir de la partida</h3><div class="sub">La partida no está terminada. Si sales sin abandonarlo, lo tienes aquí la próxima vez que abras la app.</div><div class="menu">
+    <button id="lvDel" class="btn-red">Abandonar la partida<br><small>No se guarda en el historial</small></button></div>
+    <div class="acts"><button class="btn-gold" id="lvNo">Seguir jugando</button></div>`);
+  $('#lvNo').onclick = closeModal;
+  $('#lvDel').onclick = () => { closeModal(); clearTimeout(AIT); S.game = null; render(); toast('Partida abandonada'); };
+}
+/* Botón «atrás» de Android: cierra lo que esté abierto o vuelve a la pantalla anterior.
+   Devuelve false si ya no hay nada que cerrar (entonces la app se va al fondo). */
+function goBack() {
+  if (!$('#modal').classList.contains('hidden')) { closeModal(); return true; }
+  if (S.game && S.game.st.fase === 'fin') { S.game = null; render(); return true; }
+  if (S.game) { openLeave(); return true; }
+  if (ON.sala) { if (ON.sala.estado === 'jugando') leaveOnline(); else onEnviar({ t: 'salir' }); return true; }
+  if (S.draft.mode !== 'ai') { S.draft.mode = 'ai'; render(); return true; }
+  return false;
+}
+try {
+  const AppP = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App;
+  if (AppP && AppP.addListener) AppP.addListener('backButton', () => { if (!goBack()) { if (AppP.minimizeApp) AppP.minimizeApp().catch(() => AppP.exitApp()); else AppP.exitApp(); } });
+} catch (e) {}
+
+/* ================= Arranque ================= */
+applyTheme(S.theme);
+applyFont();
+refreshUpdBadge();
+setTimeout(autoCheckUpdates, 2500);
+setTimeout(async () => {
+  try { await offerRestore(); } catch (e) {}
+  if (!S.onboarded) {
+    if (S.archive.length || S.game) { S.onboarded = true; save(); }
+    else if ($('#modal').classList.contains('hidden')) openWelcome(0);
+  }
+  if ($('#modal').classList.contains('hidden')) openIOSInstall(false);
+}, 400);
+try { if (!isNative() && navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {}); } catch (e) {}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') autoBackup(false); });
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') autoCheckUpdates(); });
+if (S.game && !cleanLive(S.game)) S.game = null;      // partida guardada dañada
+render();
+if (S.game) keepAwake();
+if ('serviceWorker' in navigator && isNative()) {
+  navigator.serviceWorker.getRegistrations().then(rs => rs.forEach(r => r.unregister())).catch(() => {});
+  if (window.caches) caches.keys().then(ks => ks.forEach(k => caches.delete(k))).catch(() => {});
+} else if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>

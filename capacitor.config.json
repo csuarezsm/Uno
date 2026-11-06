@@ -1,0 +1,9 @@
+{
+  "appId": "com.itcanarias.uno",
+  "appName": "UNO",
+  "webDir": "www",
+  "android": {
+    "backgroundColor": "#0b2a20",
+    "adjustMarginsForEdgeToEdge": "auto"
+  }
+}

@@ -8,7 +8,7 @@
   "scripts": {
     "sync": "npx cap sync android",
     "open": "npx cap open android",
-    "test": "node tests/motor.test.mjs && node tests/app.test.mjs",
+    "test": "node tests/motor.test.mjs && node tests/app.test.mjs && node tests/idiomas.test.mjs",
     "web": "bash tools/publicar-web.sh",
     "icons": "npx @capacitor/assets generate --android --iconBackgroundColor '#1b2a3a' --splashBackgroundColor '#0c1c2e'"
   },

@@ -165,7 +165,7 @@ console.log('Modo aprendizaje');
   check('hay un botón «¿Qué hago?»', !!(await p.$('#unAdvice')));
   await p.click('#unAdvice');
   check('muestra el consejo explicado', await waitFor(p, () => { const a = document.querySelector('.un-learn .adv'); return a && a.textContent.length > 50; }));
-  check('marca la carta o el botón recomendado', await waitFor(p, () => !!document.querySelector('.hc.sug, .un-act .sug')));
+  check('marca la carta o el botón recomendado', await waitFor(p, () => !!document.querySelector('.hc.sug, .un-act .sug, .un-cb.sug')));
   const n0 = (await G(p)).st.ultimo.n;
   await p.waitForTimeout(1500);
   check('el consejo nunca juega por ti: la partida espera', (await G(p)).st.ultimo.n === n0);

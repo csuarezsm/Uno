@@ -97,7 +97,7 @@ function describe(vm, u) {
   }
   return '';
 }
-const colorBtns = attr => `<div class="un-cols">${[0, 1, 2, 3].map(k => `<button class="un-cb k${k}" data-${attr}="${k}">${CN[k]}</button>`).join('')}</div>`;
+const colorBtns = (attr, sug) => `<div class="un-cols">${[0, 1, 2, 3].map(k => `<button class="un-cb k${k}${sug === k ? ' sug' : ''}" data-${attr}="${k}">${CN[k]}</button>`).join('')}</div>`;
 
 /* ================= Pantalla de inicio (contra la máquina) ================= */
 function uniqueBots(n) { return BOT_IDEAS.slice().sort(() => Math.random() - 0.5).slice(0, n); }
@@ -224,8 +224,8 @@ function actionHtml(vm, ctx, L) {
     const ot = []; for (let i = 0; i < vm.n; i++) if (i !== yo) ot.push(i);
     return `<div class="un-pick"><div class="mut">¿Con quién cambias tu mano?</div><div class="un-tg">${ot.map(i => `<button class="btn-ghost" data-po="${i}">${esc(nm(vm, i))}<small> · ${vm.seats[i].n} ${vm.seats[i].n === 1 ? 'carta' : 'cartas'}</small></button>`).join('')}</div><button class="btn-ghost sm" id="unCancel">Cancelar</button></div>`;
   }
-  if (mine && L.color) return `<div class="un-pick"><div class="mut">La carta inicial es un comodín: elige el color.</div>${colorBtns('pcc')}</div>`;
   const adv = ctx.learn && LEARN.open && mine ? getAdvice(vm) : null;
+  if (mine && L.color) return `<div class="un-pick"><div class="mut">La carta inicial es un comodín: elige el color.</div>${colorBtns('pcc', adv && adv.accion.tipo === 'color' ? adv.accion.color : null)}</div>`;
   const sug = adv ? adv.accion.tipo : null;
   const sg = t => sug === t ? ' sug' : '';
   const expSelf = vm.expuesto && vm.expuesto.i === yo;
